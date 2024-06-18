@@ -16,9 +16,6 @@ dotenv.config({
 connectDB();
 
 const PORT = process.env.PORT || 3000;
-app.get('/', (req, res) => {
-    var someHTML = "<a href=\"foo\">bar</a>"
-  res.send(someHTML);
-});
+app.use("/api/shopping/auth", require("./routes/user.js"));
 
 app.listen(PORT, console.log(`Server running in port: ${PORT}`.red.underline.bold));
