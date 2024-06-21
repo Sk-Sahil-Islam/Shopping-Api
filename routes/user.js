@@ -1,13 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const jwt_user = require('../middleware/user_jwt.js');
-const {
-    handleVerifyUser,
-    handleUserRegistration,
-    handleUserLogin } = require("../controllers/user")
+const userController = require("../controllers/user");
 
-router.get('/', jwt_user, handleVerifyUser);
-router.post('/register', handleUserRegistration);
-router.post('/login', handleUserLogin);
+router.get('/', jwt_user, userController.handleVerifyUser);
+router.post('/register', userController.handleUserRegistration);
+router.post('/login', userController.handleUserLogin);
 
 module.exports = router;

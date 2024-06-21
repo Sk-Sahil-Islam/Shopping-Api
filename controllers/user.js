@@ -49,7 +49,8 @@ async function handleUserRegistration(req, res) {
 
         const payload = {
             user: {
-                id: user.id
+                id: user.id,
+                userName: user.userName
             }
         }
 
@@ -90,7 +91,8 @@ async function handleUserLogin(req, res) {
 
         const payload = {
             user: {
-                id: user.id
+                id: user.id,
+                userName: user.userName
             }
         }
 
