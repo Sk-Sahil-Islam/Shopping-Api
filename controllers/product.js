@@ -1,9 +1,9 @@
 const Product = require('../models/Product');
 
 
-async function handleGetManFashion(req, res, next) {
+async function handleGetFashion(req, res, next) {
     try {
-        let products = await Product.find({ category: 'man' });
+        let products = await Product.find({ category: req.params.category });
         if(!products) {
             return res.status(400).json({
                 success: false,
@@ -16,8 +16,31 @@ async function handleGetManFashion(req, res, next) {
             products: products
         });
         
-    } catch (err) {
-        next(err);
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function handleGetMyProducts(req, res, next) {
+    try {
+        let products = await Product.find({ user: req.user.id });
+        if(!products) {
+            res.status(400).json({
+                success: false,
+                msg: "Some error occured"
+            });
+        }
+        res.status(200).json({
+            success: true,
+            count: products.length,
+            products: products
+        });
+
+    } catch (error) {
+        return res.status(404).json({
+            success: false,
+            msg: error
+        });
     }
 }
 
@@ -50,11 +73,64 @@ async function handleUploadProduct(req, res, next) {
             product: product
         });
     } catch (error) {
-        next(error)
+        next(error);
     }
 }
 
+async function handleEditProduct(req, res, next) {
+    try {
+        let product = await Product.findById(req.params.id);
+        if(!product) {
+            return res.status(404).json({
+                success: false,
+                msg: "Product doesn't exist"
+            });
+        }
+
+        product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true
+        });
+
+        res.status(200).json({
+            success: true,
+            product: product // no need to return you can just give a "Product updated successfully"
+        });
+    } catch (error) {
+        return res.status(404).json({
+            success: false,
+            msg: error
+        });
+    }
+}
+
+async function handleDeleteProduct(req, res, next) {
+    try {
+        let product = await Product.findById(req.params.id);
+        if(!product){
+            return res.status(404).json({
+                success: false,
+                msg: "Product doesn't exist"
+            });
+        }
+
+        product = await Product.findByIdAndDelete(req.params.id);
+        
+        res.status(200).json({
+            success: true,
+            msg: "Product deleted successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+
 module.exports = {
-    handleGetManFashion,
-    handleUploadProduct
+    handleGetFashion,
+    handleGetMyProducts,
+    handleUploadProduct,
+    handleEditProduct,
+    handleDeleteProduct
 }
