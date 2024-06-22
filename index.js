@@ -17,6 +17,7 @@ connectDB();
 
 app.use("/api/shopping/auth", require("./routes/user.js"));
 app.use("/api/shopping", require("./routes/product.js"));
+app.use("/api/shopping/reviews", require("./routes/review.js"));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, console.log(`Server running in port: ${PORT}`.red.underline.bold));
