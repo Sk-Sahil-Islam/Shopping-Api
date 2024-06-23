@@ -1,4 +1,5 @@
 const Review = require('../models/Review');
+const Product = require('../models/Product');
 
 async function handleGetReviews(req, res) {
     try {
@@ -18,7 +19,7 @@ async function handleGetReviews(req, res) {
     } catch (error) {
         return res.status(404).json({
             success: false,
-            msg: error
+            msg: error.message
         });
     }
 }
@@ -36,11 +37,24 @@ async function handleUploadReview(req, res) {
         });
 
         if(!review) {
-            res.staus(400).json({
+            return res.staus(400).json({
                 success: false,
                 msg: "Something went wrong"
             });
         }
+        const product = await Product.findById(req.params.productId);
+        if(!product) {
+            return res.staus(400).json({
+                success: false,
+                msg: "Something went wrong"
+            });
+        }
+        const totalRating = product.rating * product.totalRatings + review.rating;
+        product.rating = (totalRating)/(product.totalRatings + 1);
+        product.totalRatings += 1;
+
+        await product.save();
+
         res.status(200).json({
             success: true,
             review: review
@@ -49,14 +63,14 @@ async function handleUploadReview(req, res) {
     } catch (error) {
         return res.status(404).json({
             success: false,
-            msg: error
+            msg: error.message
         });
     }
 }
 
 async function handleEditReview(req, res) {
     try {
-        let review = await Review.findById(req.params.id);
+        let review = await Review.findById(req.params.reviewId);
         if(!review) {
             return res.status(400).json({
                 success: false,
@@ -64,7 +78,21 @@ async function handleEditReview(req, res) {
             });
         }
 
-        review = await Review.findByIdAndUpdate(req.params.id, req.body, {
+        const product = await Product.findById(req.query.productId);
+        if(!product) {
+            return res.staus(400).json({
+                success: false,
+                msg: "Something went wrong"
+            });
+        }
+        if(req.body.rating) {
+            let currentTotalRating = product.rating * product.totalRatings - review.rating + req.body.rating;
+            product.rating = (currentTotalRating)/(product.totalRatings);
+
+            await product.save();
+        }
+    
+        review = await Review.findByIdAndUpdate(req.params.reviewId, req.body, {
             new: true,
             runValidators: true
         });
@@ -83,7 +111,7 @@ async function handleEditReview(req, res) {
 
 async function handleDeleteReview(req, res) {
     try {
-        let review = await Review.findById(req.params.id);
+        let review = await Review.findById(req.query.reviewId);
         if(!review) {
             return res.status(400).json({
                 success: false,
@@ -91,7 +119,24 @@ async function handleDeleteReview(req, res) {
             });
         }
 
-        review = await Review.findByIdAndDelete(req.params.id);
+        const product = await Product.findById(req.query.productId);
+        if(!product) {
+            return res.staus(400).json({
+                success: false,
+                msg: "Something went wrong"
+            });
+        }
+        const totalRating = product.rating * product.totalRatings - review.rating;
+        if(product.totalRatings === 1) {
+            product.rating = 0;
+        } else {
+            product.rating = (totalRating)/(product.totalRatings - 1);
+        }
+        product.totalRatings -= 1;
+        
+        await product.save();
+    
+        review = await Review.findByIdAndDelete(req.query.reviewId);
 
         res.status(200).json({
             success: true,
@@ -137,22 +182,7 @@ async function handleAddComment(req, res) {
 }
 
 async function handleDeleteComment(req, res) {
-    try {
-        // const v = req.user.id !== req.query.userId;
-
-        // return res.status(200).json({
-        //     1: req.user.id,
-        //     2: req.query.userId,
-        //     v
-        // });
-
-        // if(req.user.id !== req.query.userId) {
-        //     return res.status(401).json({
-        //         status: false,
-        //         msg: "You are not authorized to perform the action"
-        //     });
-        // }
-    
+    try {  
         let review = await Review.findById(req.query.reviewId);
         if (!review) {
             return res.status(400).json({

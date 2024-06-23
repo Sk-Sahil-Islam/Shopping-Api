@@ -51,8 +51,12 @@ const productSchema = mongoose.Schema({
     },
     rating: {
         type: Number,
-        required: true
+        default: 0.0
+    },
+    totalRatings: {
+        type: Number,
+        default: 0
     }
-})
+});
 
 module.exports = mongoose.model("Product", productSchema);

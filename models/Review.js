@@ -25,7 +25,7 @@ const reviewSchema = mongoose.Schema({
     },
     likes: {
         type: Number,
-        defalut: 0
+        default: 0
     },
     comments: {
         type: [
