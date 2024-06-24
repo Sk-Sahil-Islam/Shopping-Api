@@ -71,6 +71,7 @@ async function handleUploadReview(req, res) {
 async function handleEditReview(req, res) {
     try {
         let review = await Review.findById(req.params.reviewId);
+        
         if(!review) {
             return res.status(400).json({
                 success: false,
@@ -104,7 +105,7 @@ async function handleEditReview(req, res) {
     } catch (error) {
         return res.status(404).json({
             success: false,
-            msg: error
+            msg: error.message
         });
     }
 }
