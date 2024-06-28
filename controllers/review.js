@@ -116,7 +116,7 @@ async function handleDeleteReview(req, res) {
         if(!review) {
             return res.status(400).json({
                 success: false,
-                msg: "Review doesn't exit"
+                msg: "Review doesn't exist"
             });
         }
 
