@@ -118,7 +118,7 @@ async function handleDeleteProduct(req, res, next) {
         
         res.status(200).json({
             success: true,
-            msg: "Product deleted successfully"
+            msg: "Product delete successfully"
         });
     } catch (error) {
         next(error);
