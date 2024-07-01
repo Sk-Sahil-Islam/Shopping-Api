@@ -188,7 +188,7 @@ async function handleDeleteComment(req, res) {
         if (!review) {
             return res.status(400).json({
                 success: false,
-                msg: "Review doesn't exist"
+                msg: "Review does not exist"
             });
         }
 
